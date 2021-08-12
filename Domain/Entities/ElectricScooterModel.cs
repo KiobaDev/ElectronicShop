@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Domain.Entities
 {
@@ -7,7 +6,7 @@ namespace Domain.Entities
     {
         public ElectricScooterModel()
         {
-            Orders = new HashSet<Order>();
+            ScooterOrders = new HashSet<ScooterOrder>();
         }
 
         public int ElectricScooterId { get; set; }
@@ -24,6 +23,6 @@ namespace Domain.Entities
         public int AvaliableAmountId { get; set; }
         public virtual AvaliableAmount AvaliableAmount { get; set; }
 
-        public virtual ICollection<Order> Orders { get; private set; }
+        public virtual ICollection<ScooterOrder> ScooterOrders { get; set; }
     }
 }

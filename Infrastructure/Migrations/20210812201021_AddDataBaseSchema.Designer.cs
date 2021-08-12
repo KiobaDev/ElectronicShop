@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20210812165003_AddIdentityTables")]
-    partial class AddIdentityTables
+    [Migration("20210812201021_AddDataBaseSchema")]
+    partial class AddDataBaseSchema
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -123,6 +123,129 @@ namespace Infrastructure.Migrations
                     b.ToTable("AspNetUsers");
                 });
 
+            modelBuilder.Entity("Domain.Entities.AvaliableAmount", b =>
+                {
+                    b.Property<int>("AvaliableAmountId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Amount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ElectricScooterId")
+                        .HasColumnType("int");
+
+                    b.HasKey("AvaliableAmountId");
+
+                    b.ToTable("AvaliableAmount");
+                });
+
+            modelBuilder.Entity("Domain.Entities.ElectricScooterModel", b =>
+                {
+                    b.Property<int>("ElectricScooterId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("AvaliableAmountId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("AvaliableScooterAmount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("EnginePower")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MaxSpeed")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MaximumLoad")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RangeOnASingleCharge")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ScooterAdditionalNotes")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ScooterName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("ScooterPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<double>("TheSizeOfTheWheels")
+                        .HasColumnType("float");
+
+                    b.HasKey("ElectricScooterId");
+
+                    b.ToTable("ElectricScooterModel");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Magazine", b =>
+                {
+                    b.Property<int>("MagazineId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("BuildingNumber")
+                        .HasColumnType("int");
+
+                    b.Property<string>("City")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MagazineName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PostalCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Street")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("MagazineId");
+
+                    b.ToTable("Magazine");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Order", b =>
+                {
+                    b.Property<int>("OrderId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("MagazineId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("OrderNumber")
+                        .HasColumnType("int");
+
+                    b.HasKey("OrderId");
+
+                    b.HasIndex("MagazineId");
+
+                    b.ToTable("Order");
+                });
+
+            modelBuilder.Entity("Domain.Entities.ScooterOrder", b =>
+                {
+                    b.Property<int>("ElectricScooterId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("OrderId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ElectricScooterId", "OrderId");
+
+                    b.HasIndex("OrderId");
+
+                    b.ToTable("ScooterOrder");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
                 {
                     b.Property<int>("Id")
@@ -224,6 +347,47 @@ namespace Infrastructure.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
+            modelBuilder.Entity("Domain.Entities.AvaliableAmount", b =>
+                {
+                    b.HasOne("Domain.Entities.ElectricScooterModel", "ElectricScooter")
+                        .WithOne("AvaliableAmount")
+                        .HasForeignKey("Domain.Entities.AvaliableAmount", "AvaliableAmountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ElectricScooter");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Order", b =>
+                {
+                    b.HasOne("Domain.Entities.Magazine", "Magazine")
+                        .WithMany("Orders")
+                        .HasForeignKey("MagazineId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Magazine");
+                });
+
+            modelBuilder.Entity("Domain.Entities.ScooterOrder", b =>
+                {
+                    b.HasOne("Domain.Entities.ElectricScooterModel", "ElectricScooterModel")
+                        .WithMany("ScooterOrders")
+                        .HasForeignKey("ElectricScooterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.Order", "Order")
+                        .WithMany("ScooterOrders")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ElectricScooterModel");
+
+                    b.Navigation("Order");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
                 {
                     b.HasOne("Domain.Entities.ApplicationRole", null)
@@ -273,6 +437,23 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Domain.Entities.ElectricScooterModel", b =>
+                {
+                    b.Navigation("AvaliableAmount");
+
+                    b.Navigation("ScooterOrders");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Magazine", b =>
+                {
+                    b.Navigation("Orders");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Order", b =>
+                {
+                    b.Navigation("ScooterOrders");
                 });
 #pragma warning restore 612, 618
         }

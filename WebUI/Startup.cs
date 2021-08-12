@@ -37,7 +37,7 @@ namespace WebUI
             }).AddEntityFrameworkStores<ApplicationDbContext>();
 
             services.AddDbContext<ApplicationDbContext>(cfg =>
-            cfg.UseSqlServer(Configuration.GetConnectionString("ElectronicShopConnection")));
+            cfg.UseSqlServer(Configuration.GetConnectionString("ScooterDistributionConnection")));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

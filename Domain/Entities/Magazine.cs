@@ -8,7 +8,7 @@ namespace Domain.Entities
     {
         public Magazine()
         {
-            OrderMagazines = new HashSet<OrderMagazine>();
+            Orders = new HashSet<Order>();
         }
 
         public int MagazineId { get; set; }
@@ -18,6 +18,6 @@ namespace Domain.Entities
         public string City { get; set; }
         public string PostalCode { get; set; }
 
-        public virtual ICollection<OrderMagazine> OrderMagazines { get; private set; }
+        public virtual ICollection<Order> Orders { get; private set; }
     }
 }

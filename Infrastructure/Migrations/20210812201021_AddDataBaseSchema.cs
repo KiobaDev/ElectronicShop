@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Infrastructure.Migrations
 {
-    public partial class AddIdentityTables : Migration
+    public partial class AddDataBaseSchema : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -48,6 +48,45 @@ namespace Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ElectricScooterModel",
+                columns: table => new
+                {
+                    ElectricScooterId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ScooterName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    EnginePower = table.Column<int>(type: "int", nullable: false),
+                    MaxSpeed = table.Column<int>(type: "int", nullable: false),
+                    RangeOnASingleCharge = table.Column<int>(type: "int", nullable: false),
+                    TheSizeOfTheWheels = table.Column<double>(type: "float", nullable: false),
+                    MaximumLoad = table.Column<int>(type: "int", nullable: false),
+                    ScooterPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    AvaliableScooterAmount = table.Column<int>(type: "int", nullable: false),
+                    ScooterAdditionalNotes = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AvaliableAmountId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ElectricScooterModel", x => x.ElectricScooterId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Magazine",
+                columns: table => new
+                {
+                    MagazineId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    MagazineName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    BuildingNumber = table.Column<int>(type: "int", nullable: false),
+                    Street = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    City = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PostalCode = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Magazine", x => x.MagazineId);
                 });
 
             migrationBuilder.CreateTable(
@@ -156,6 +195,70 @@ namespace Infrastructure.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "AvaliableAmount",
+                columns: table => new
+                {
+                    AvaliableAmountId = table.Column<int>(type: "int", nullable: false),
+                    Amount = table.Column<int>(type: "int", nullable: false),
+                    ElectricScooterId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AvaliableAmount", x => x.AvaliableAmountId);
+                    table.ForeignKey(
+                        name: "FK_AvaliableAmount_ElectricScooterModel_AvaliableAmountId",
+                        column: x => x.AvaliableAmountId,
+                        principalTable: "ElectricScooterModel",
+                        principalColumn: "ElectricScooterId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Order",
+                columns: table => new
+                {
+                    OrderId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    OrderNumber = table.Column<int>(type: "int", nullable: false),
+                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    MagazineId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Order", x => x.OrderId);
+                    table.ForeignKey(
+                        name: "FK_Order_Magazine_MagazineId",
+                        column: x => x.MagazineId,
+                        principalTable: "Magazine",
+                        principalColumn: "MagazineId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ScooterOrder",
+                columns: table => new
+                {
+                    ElectricScooterId = table.Column<int>(type: "int", nullable: false),
+                    OrderId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ScooterOrder", x => new { x.ElectricScooterId, x.OrderId });
+                    table.ForeignKey(
+                        name: "FK_ScooterOrder_ElectricScooterModel_ElectricScooterId",
+                        column: x => x.ElectricScooterId,
+                        principalTable: "ElectricScooterModel",
+                        principalColumn: "ElectricScooterId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ScooterOrder_Order_OrderId",
+                        column: x => x.OrderId,
+                        principalTable: "Order",
+                        principalColumn: "OrderId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -194,6 +297,16 @@ namespace Infrastructure.Migrations
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Order_MagazineId",
+                table: "Order",
+                column: "MagazineId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ScooterOrder_OrderId",
+                table: "ScooterOrder",
+                column: "OrderId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -214,10 +327,25 @@ namespace Infrastructure.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "AvaliableAmount");
+
+            migrationBuilder.DropTable(
+                name: "ScooterOrder");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "ElectricScooterModel");
+
+            migrationBuilder.DropTable(
+                name: "Order");
+
+            migrationBuilder.DropTable(
+                name: "Magazine");
         }
     }
 }

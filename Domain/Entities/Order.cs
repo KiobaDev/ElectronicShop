@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Domain.Entities
 {
@@ -8,8 +7,7 @@ namespace Domain.Entities
     {
         public Order()
         {
-            ElectricScooters = new HashSet<ElectricScooterModel>();
-            OrderMagazines = new HashSet<OrderMagazine>();
+            ScooterOrders = new HashSet<ScooterOrder>();
         }
 
         public int OrderId { get; set; }
@@ -19,7 +17,6 @@ namespace Domain.Entities
         public int MagazineId { get; set; }
         public virtual Magazine Magazine { get; set; }
 
-        public virtual ICollection<ElectricScooterModel> ElectricScooters { get; private set; }
-        public virtual ICollection<OrderMagazine> OrderMagazines { get; private set; }
+        public virtual ICollection<ScooterOrder> ScooterOrders { get; set; }
     }
 }

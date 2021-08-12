@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20210812181335_AddOrderMagazinesEntity")]
-    partial class AddOrderMagazinesEntity
+    [Migration("20210812201144_AddSeedMethod")]
+    partial class AddSeedMethod
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -136,7 +136,15 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("AvaliableAmountId");
 
-                    b.ToTable("AvaliableAmounts");
+                    b.ToTable("AvaliableAmount");
+
+                    b.HasData(
+                        new
+                        {
+                            AvaliableAmountId = 1,
+                            Amount = 56,
+                            ElectricScooterId = 1
+                        });
                 });
 
             modelBuilder.Entity("Domain.Entities.ElectricScooterModel", b =>
@@ -178,7 +186,23 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("ElectricScooterId");
 
-                    b.ToTable("ElectricScooterModels");
+                    b.ToTable("ElectricScooterModel");
+
+                    b.HasData(
+                        new
+                        {
+                            ElectricScooterId = 1,
+                            AvaliableAmountId = 1,
+                            AvaliableScooterAmount = 0,
+                            EnginePower = 250,
+                            MaxSpeed = 25,
+                            MaximumLoad = 100,
+                            RangeOnASingleCharge = 25,
+                            ScooterAdditionalNotes = "Impulse to hulajnoga elektryczna dla młodzieży i dorosłych. Waży 11,8kg posiada 8,5 calowe kola z pompowanymi oponami, które gwarantują swobodę poruszania",
+                            ScooterName = "FRUGAL Impulse",
+                            ScooterPrice = 999.99m,
+                            TheSizeOfTheWheels = 8.5
+                        });
                 });
 
             modelBuilder.Entity("Domain.Entities.Magazine", b =>
@@ -205,7 +229,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("MagazineId");
 
-                    b.ToTable("Magazines");
+                    b.ToTable("Magazine");
                 });
 
             modelBuilder.Entity("Domain.Entities.Order", b =>
@@ -228,37 +252,22 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("MagazineId");
 
-                    b.ToTable("Orders");
+                    b.ToTable("Order");
                 });
 
-            modelBuilder.Entity("Domain.Entities.OrderMagazine", b =>
+            modelBuilder.Entity("Domain.Entities.ScooterOrder", b =>
                 {
+                    b.Property<int>("ElectricScooterId")
+                        .HasColumnType("int");
+
                     b.Property<int>("OrderId")
                         .HasColumnType("int");
 
-                    b.Property<int>("MagazineId")
-                        .HasColumnType("int");
+                    b.HasKey("ElectricScooterId", "OrderId");
 
-                    b.HasKey("OrderId", "MagazineId");
+                    b.HasIndex("OrderId");
 
-                    b.HasIndex("MagazineId");
-
-                    b.ToTable("OrderMagazines");
-                });
-
-            modelBuilder.Entity("ElectricScooterModelOrder", b =>
-                {
-                    b.Property<int>("ElectricScootersElectricScooterId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("OrdersOrderId")
-                        .HasColumnType("int");
-
-                    b.HasKey("ElectricScootersElectricScooterId", "OrdersOrderId");
-
-                    b.HasIndex("OrdersOrderId");
-
-                    b.ToTable("ElectricScooterModelOrder");
+                    b.ToTable("ScooterOrder");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
@@ -376,7 +385,7 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Domain.Entities.Order", b =>
                 {
                     b.HasOne("Domain.Entities.Magazine", "Magazine")
-                        .WithMany()
+                        .WithMany("Orders")
                         .HasForeignKey("MagazineId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -384,38 +393,23 @@ namespace Infrastructure.Migrations
                     b.Navigation("Magazine");
                 });
 
-            modelBuilder.Entity("Domain.Entities.OrderMagazine", b =>
+            modelBuilder.Entity("Domain.Entities.ScooterOrder", b =>
                 {
-                    b.HasOne("Domain.Entities.Magazine", "Magazine")
-                        .WithMany("OrderMagazines")
-                        .HasForeignKey("MagazineId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                    b.HasOne("Domain.Entities.ElectricScooterModel", "ElectricScooterModel")
+                        .WithMany("ScooterOrders")
+                        .HasForeignKey("ElectricScooterId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Domain.Entities.Order", "Order")
-                        .WithMany("OrderMagazines")
+                        .WithMany("ScooterOrders")
                         .HasForeignKey("OrderId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Magazine");
+                    b.Navigation("ElectricScooterModel");
 
                     b.Navigation("Order");
-                });
-
-            modelBuilder.Entity("ElectricScooterModelOrder", b =>
-                {
-                    b.HasOne("Domain.Entities.ElectricScooterModel", null)
-                        .WithMany()
-                        .HasForeignKey("ElectricScootersElectricScooterId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Entities.Order", null)
-                        .WithMany()
-                        .HasForeignKey("OrdersOrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
@@ -472,16 +466,18 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Domain.Entities.ElectricScooterModel", b =>
                 {
                     b.Navigation("AvaliableAmount");
+
+                    b.Navigation("ScooterOrders");
                 });
 
             modelBuilder.Entity("Domain.Entities.Magazine", b =>
                 {
-                    b.Navigation("OrderMagazines");
+                    b.Navigation("Orders");
                 });
 
             modelBuilder.Entity("Domain.Entities.Order", b =>
                 {
-                    b.Navigation("OrderMagazines");
+                    b.Navigation("ScooterOrders");
                 });
 #pragma warning restore 612, 618
         }

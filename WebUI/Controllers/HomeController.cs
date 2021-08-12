@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Infrastructure.Data;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 using WebUI.Models;
@@ -8,15 +9,18 @@ namespace WebUI.Controllers
     
     public class HomeController : Controller
     {
+        private readonly ApplicationDbContext coon;
         private readonly ILogger<HomeController> _logger;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, ApplicationDbContext coo)
         {
+            coon = coo;
             _logger = logger;
         }
 
         public IActionResult Index()
         {
+            
             return View();
         }
 
