@@ -26,6 +26,9 @@ namespace WebUI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var servicesInjection = new ServicesDIContainer(services);
+                servicesInjection.ServicesDI();
+
             services.AddControllersWithViews();
 
             services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
@@ -34,7 +37,7 @@ namespace WebUI
             }).AddEntityFrameworkStores<ApplicationDbContext>();
 
             services.AddDbContext<ApplicationDbContext>(cfg =>
-            cfg.UseSqlServer(Configuration.GetConnectionString("ElectricShopConnection")));
+            cfg.UseSqlServer(Configuration.GetConnectionString("ElectronicShopConnection")));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

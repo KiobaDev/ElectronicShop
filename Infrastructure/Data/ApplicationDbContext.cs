@@ -7,10 +7,6 @@ namespace Infrastructure.Data
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, int>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            base.OnModelCreating(modelBuilder);
-        }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuildier)
         {
@@ -18,5 +14,14 @@ namespace Infrastructure.Data
 
             base.OnConfiguring(optionsBuildier);
         }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            
+            var init = new DbInitializer();
+                init.Seed(modelBuilder);
+        }
+
     }
 }
