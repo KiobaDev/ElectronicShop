@@ -1,4 +1,8 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Application.AvaliableAmountModel.Interface;
+using Application.ElectricScooterModel.Interface;
+using Application.Helpers;
+using Infrastructure.Repositories;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Infrastructure.Data
 {
@@ -11,7 +15,9 @@ namespace Infrastructure.Data
         }
         public void ServicesDI()
         {
-
+            this._services.AddScoped<IUnitOfWork, UnitOfWork>();
+            this._services.AddScoped<IAvaliableAmountRepository, AvaliableAmountRepository>();
+            this._services.AddScoped<IElectricScooterRepository, ElectricScooterRepository>();
         }
     }
 }

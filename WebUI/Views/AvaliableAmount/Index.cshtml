@@ -1,0 +1,10 @@
+﻿@model Application.AvaliableAmountModel.ViewModels.AvaliableAmountIndexViewModel
+
+    <div class="panel">
+        <div class="col-6 form-group">
+            @Html.EditorFor(m => m.AddingAmount, new { @class = "form-control" })
+        </div>
+        <div class="col-6 form-group">
+           @Html.DropDownListFor(m => m.ScooterId,new SelectList(Model.Scooters, "ElectricScooterId", "ScooterName"), new { @class ="form-control" })
+        </div>
+    </div>
